@@ -14,12 +14,16 @@ import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
+    private var width_bonus = 0
+
     private var cellSelected_x = 0
     private var cellSelected_y = 0
 
+    private var levelMoves = 64
     private var movesRequired = 4
     private var moves = 64
     private var options = 0
+    private var bonus = 0
 
     private var nameColorBlack = "black_cell"
     private var nameColorWhite = "white_cell"
@@ -101,6 +105,14 @@ class MainActivity : AppCompatActivity() {
         var tvMovesData = findViewById<TextView>(R.id.tvMovesData)
         tvMovesData.text = moves.toString()
 
+        growProgressBonus()
+
+        if(board[x][y] == 2){
+            bonus++
+            var tvBonusData = findViewById<TextView>(R.id.tvBonusData)
+            tvBonusData.text = " + $bonus"
+        }
+
         board[x][y] = 1
         paintHorseCell(cellSelected_x,cellSelected_y, "previus_cell")
 
@@ -119,6 +131,22 @@ class MainActivity : AppCompatActivity() {
         }//else checkSuccessfulEnd()
     }
 
+    private fun growProgressBonus() {
+
+        var moves_done = levelMoves - moves
+        var bonus_done = moves_done / movesRequired
+        var moves_rest = movesRequired * (bonus_done)
+        var bonus_grow = moves_done - moves_rest
+
+        var v = findViewById<View>(R.id.vNewBonus)
+
+        var widthBonus = ((width_bonus/movesRequired) * bonus_grow).toFloat()
+
+        var height = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics()).toInt()
+        var width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthBonus, getResources().getDisplayMetrics()).toInt()
+        v.setLayoutParams(TableRow.LayoutParams(width, height))
+    }
+
     private fun checkNewBonus() {
         //Si de los movimientos que tiene es un multiplo de los requeridos
         if (moves%movesRequired == 0){
@@ -132,7 +160,8 @@ class MainActivity : AppCompatActivity() {
 
                 if (board[bonusCell_x][bonusCell_y] == 0) bonusCell = true
             }
-            board[bonusCell_x][bonusCell_y] == 2
+
+            board[bonusCell_x][bonusCell_y] = 2
             paintBonusCell(bonusCell_x, bonusCell_y)
         }
     }
@@ -189,7 +218,7 @@ class MainActivity : AppCompatActivity() {
                 options++
                 paintOptions(option_x, option_y)
 
-                board[option_x][option_y] = 9
+                if (board[option_x][option_y] == 0) board[option_x][option_y] = 9
             }
         }
     }
@@ -249,6 +278,8 @@ class MainActivity : AppCompatActivity() {
         val width_cell = (width_dp - lateralMarginsDP)/8
         //la altura es lo mismo (con respecto a la celda)
         val height_cell = width_cell
+
+        width_bonus = 2 * width_cell.toInt()
 
         for (i in 0..7){
             for (j in 0..7){
