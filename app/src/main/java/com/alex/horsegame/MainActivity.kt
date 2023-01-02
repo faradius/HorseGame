@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     private var options = 0
     private var bonus = 0
 
+    private var checkMovement = true
+
     private var nameColorBlack = "black_cell"
     private var nameColorWhite = "white_cell"
 
@@ -48,18 +50,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkCell(x: Int, y: Int) {
-        var dif_x = x - cellSelected_x
-        var dif_y = y - cellSelected_y
 
-        var checkTrue = false
-        if (dif_x == 1 && dif_y == 2) checkTrue = true
-        if (dif_x == 1 && dif_y == -2) checkTrue = true
-        if (dif_x == 2 && dif_y == 1) checkTrue = true
-        if (dif_x == 2 && dif_y == -1) checkTrue = true
-        if (dif_x == -1 && dif_y == 2) checkTrue = true
-        if (dif_x == -1 && dif_y == -2) checkTrue = true
-        if (dif_x == -2 && dif_y == 1) checkTrue = true
-        if (dif_x == -2 && dif_y == -1) checkTrue = true
+        var checkTrue = true
+        if(checkMovement){
+            var dif_x = x - cellSelected_x
+            var dif_y = y - cellSelected_y
+
+            checkTrue = false
+            if (dif_x == 1 && dif_y == 2) checkTrue = true
+            if (dif_x == 1 && dif_y == -2) checkTrue = true
+            if (dif_x == 2 && dif_y == 1) checkTrue = true
+            if (dif_x == 2 && dif_y == -1) checkTrue = true
+            if (dif_x == -1 && dif_y == 2) checkTrue = true
+            if (dif_x == -1 && dif_y == -2) checkTrue = true
+            if (dif_x == -2 && dif_y == 1) checkTrue = true
+            if (dif_x == -2 && dif_y == -1) checkTrue = true
+        }else{
+            if (board[x][y] != 1){
+                bonus--
+                var tvBonusData = findViewById<TextView>(R.id.tvBonusData)
+                tvBonusData.text = " + $bonus"
+                if (bonus == 0) tvBonusData.text = ""
+            }
+        }
 
         if (board[x][y] == 1) checkTrue = false
 
@@ -122,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         clarOptions()
 
         paintHorseCell(x,y, "selected_cell")
-
+        checkMovement = true
         checkOption(x, y)
 
         if (moves > 0){
@@ -135,6 +148,19 @@ class MainActivity : AppCompatActivity() {
     private fun checkGameOver(x: Int, y: Int) {
         if(options == 0){
             if (bonus == 0) showMessage("Game Over", "Try Again!", true)
+            else{
+                checkMovement = false
+                paintAllOptions()
+            }
+        }
+    }
+
+    private fun paintAllOptions() {
+        for (i in 0..7){
+            for (j in 0..7){
+                if (board[i][j] != 1) paintOption(i, j)
+                if (board[i][j] == 0) board[i][j] = 9
+            }
         }
     }
 
@@ -245,7 +271,7 @@ class MainActivity : AppCompatActivity() {
         if (option_x < 8 && option_y < 8 && option_x >= 0 && option_y >= 0){
             if (board[option_x][option_y] == 0 || board[option_x][option_y] == 2){
                 options++
-                paintOptions(option_x, option_y)
+                paintOption(option_x, option_y)
 
                 if (board[option_x][option_y] == 0) board[option_x][option_y] = 9
             }
@@ -264,7 +290,7 @@ class MainActivity : AppCompatActivity() {
         return color
     }
 
-    private fun paintOptions(x: Int, y: Int) {
+    private fun paintOption(x: Int, y: Int) {
         var iv: ImageView = findViewById(resources.getIdentifier("c$x$y","id", packageName))
         if (checkColorCell(x,y) == "black") iv.setBackgroundResource(R.drawable.option_black)
         else iv.setBackgroundResource(R.drawable.option_white)
