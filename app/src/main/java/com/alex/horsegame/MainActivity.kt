@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.test.runner.screenshot.ScreenCapture
 import androidx.test.runner.screenshot.Screenshot.capture
+import com.stripe.android.PaymentConfiguration
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -71,6 +72,19 @@ class MainActivity : AppCompatActivity() {
 
         iniScreenGame()
         startGame()
+    }
+
+    fun launchPaymentCard(v:View){
+        callPayment()
+    }
+
+    private fun callPayment(){
+        var keyStripePayment = "pk_test_51MMHrPGGQj0VnQJSeaYOeR6LmLBES3yJBMOjRZQ3lIAU9BUj7v5H3yDwIehksKOonunUnYxb5gU6EdqYovvcnbwV00tQgoD6cO"
+
+        PaymentConfiguration.init(applicationContext, keyStripePayment)
+
+        val intent = Intent(this, CheckoutActivity::class.java)
+        startActivity(intent)
     }
 
     private fun iniScreenGame() {

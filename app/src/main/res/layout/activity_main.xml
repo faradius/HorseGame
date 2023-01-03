@@ -24,7 +24,8 @@
             android:textAlignment="center"
             android:background="@color/contrast_data"
             android:textColor="@color/app_color_light"
-            android:paddingVertical="8dp" />
+            android:paddingVertical="8dp"
+            android:onClick="launchPaymentCard"/>
 
     </LinearLayout>
 
