@@ -7,6 +7,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResult
 import okhttp3.*
@@ -14,6 +16,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
+
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class CheckoutActivity : AppCompatActivity() {
     companion object {
@@ -44,13 +49,18 @@ class CheckoutActivity : AppCompatActivity() {
     private fun fetchPaymentIntent() {
         val url = "$BACKEND_URL/create-payment-intent"
 
-        val shoppingCartContent = """
-            {
-                "items": [
-                    {"id":"xl-tshirt"}
-                ]
-            }
-        """
+        val amount = 100.0f
+        val payMap: MutableMap<String, Any> = HashMap()
+        val itemMap: MutableMap<String, Any> = HashMap()
+        val itemList: MutableList<Map<String, Any>> = ArrayList()
+
+        payMap["currency"] = "usd"
+        itemMap["id"] = "photo_suscription"
+        itemMap["amount"] = amount
+        itemList.add(itemMap)
+        payMap["items"] = itemList
+
+        val shoppingCartContent = Gson().toJson(payMap)
 
         val mediaType = "application/json; charset=utf-8".toMediaType()
 
@@ -91,10 +101,14 @@ class CheckoutActivity : AppCompatActivity() {
         }
     }
 
-    private fun showToast(message: String) {
+    private fun showSnackBar(message: String, duration: Int) {
+        /*
         runOnUiThread {
             Toast.makeText(this,  message, Toast.LENGTH_LONG).show()
         }
+        */
+        val mySnackbar = Snackbar.make(findViewById(R.id.lyMain), message, duration)
+        mySnackbar.show()
     }
 
     private fun onPayClicked(view: View) {
@@ -107,13 +121,15 @@ class CheckoutActivity : AppCompatActivity() {
     private fun onPaymentSheetResult(paymentResult: PaymentSheetResult) {
         when (paymentResult) {
             is PaymentSheetResult.Completed -> {
-                showToast("Payment complete!")
+                showSnackBar("Payment complete!", Snackbar.LENGTH_LONG)
             }
             is PaymentSheetResult.Canceled -> {
                 Log.i(TAG, "Payment canceled!")
+                showSnackBar("Payment canceled. Try again", Snackbar.LENGTH_LONG)
             }
             is PaymentSheetResult.Failed -> {
-                showAlert("Payment failed", paymentResult.error.localizedMessage)
+                //showAlert("Payment failed", paymentResult.error.localizedMessage)
+                showSnackBar("Payment failed. Try again", Snackbar.LENGTH_LONG)
             }
         }
     }
